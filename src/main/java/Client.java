@@ -1,10 +1,4 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
+import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -14,25 +8,28 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.eclipse.jgit.api.CloneCommand;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.kohsuke.github.GHRepository;
+import org.kohsuke.github.GitHub;
 
 
-
-
-    @SuppressWarnings("deprecation")
+@SuppressWarnings("deprecation")
     public class Client {
 
         public static void main(String[] args) {
 
-            String token = "e820f8581a8ff4972c30ede01fd05830168a00a8";
+            String token = "c0923afa5e0170832d6043f993d1bd9b2c690236";
 
-            String url = "raw.githubusercontent.com/Crunchify/All-in-One-Webmaster/master/readme.txt";
+            String url = "github.com/colonist-j/GithubBackupApplication.git";
 
             // HttpClient Method to get Private Github content with Basic OAuth token
             getGithubContentUsingHttpClient(token, url);
 
             // URLConnection Method to get Private Github content with Basic OAuth token
-            getGithubContentUsingURLConnection(token, url);
-
+           //getGithubContentUsingURLConnection(token, url);
+           // cloneRep();
         }
 
         @SuppressWarnings("resource")
@@ -43,6 +40,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
             System.out.println(newUrl);
             try {
                 HttpResponse response = client.execute(request);
+                System.out.println(response);
                 String responseString = new BasicResponseHandler().handleResponse(response);
                 System.out.println(responseString);
             } catch (IOException e) {
@@ -59,32 +57,58 @@ import org.apache.http.impl.client.DefaultHttpClient;
                 token = token + ":x-oauth-basic";
                 String authString = "Basic " + Base64.encodeBase64String(token.getBytes());
                 connection.setRequestProperty("Authorization", authString);
-                InputStream crunchifyInStream = connection.getInputStream();
-                System.out.println(crunchifyGetStringFromStream(crunchifyInStream));
+                InputStream dataInStream = connection.getInputStream();
+                System.out.println(dataGetStringFromStream(dataInStream) );
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
-        // ConvertStreamToString() Utility - we name it as crunchifyGetStringFromStream()
-        private static String crunchifyGetStringFromStream(InputStream crunchifyStream) throws IOException {
-            if (crunchifyStream != null) {
-                Writer crunchifyWriter = new StringWriter();
 
-                char[] crunchifyBuffer = new char[2048];
+        // ConvertStreamToString() Utility - we name it as dataGetStringFromStream()
+        private static String dataGetStringFromStream(InputStream dataStream) throws IOException {
+            if (dataStream != null) {
+                Writer stringWriter = new StringWriter();
+                char[] dataBuffer = new char[2048];
                 try {
-                    Reader crunchifyReader = new BufferedReader(new InputStreamReader(crunchifyStream, "UTF-8"));
+                    Reader dataReader = new BufferedReader(new InputStreamReader(dataStream, "UTF-8"));
                     int counter;
-                    while ((counter = crunchifyReader.read(crunchifyBuffer)) != -1) {
-                        crunchifyWriter.write(crunchifyBuffer, 0, counter);
+                    while ((counter = dataReader.read(dataBuffer)) != -1) {
+                        stringWriter.write(dataBuffer, 0, counter);
                     }
                 } finally {
-                    crunchifyStream.close();
+
+
+                    dataStream.close();
                 }
-                return crunchifyWriter.toString();
+                return stringWriter.toString();
             } else {
                 return "No Contents";
             }
         }
+//        public static void cloneRep() {
+//            String login = "colonist-j";
+//            String password = "makeevka24";
+//            String rep = "https://github.com/colonist-j/GithubBackupApplication.git";
+//            String localDir = "/Users/ilya_zhdanov/Downloads/repository/";
+//            try {
+//                System.out.println("Connecting...." + login + " : " + password);
+//                GitHub gitHub = GitHub.connectUsingPassword(login, password);
+//                boolean isValid = gitHub.isCredentialValid();
+//                System.out.println("is Valid ? " + isValid);
+//                if (isValid) {
+//                    GHRepository repository = gitHub.getRepository(rep);
+//                    CloneCommand cloneCommand = Git.cloneRepository();
+//                    cloneCommand.setDirectory(new File("/Users/ilya_zhdanov/Desktop/sombrero"));
+//                    cloneCommand.setNoCheckout(true);
+//                    cloneCommand.setRemote( "https://github.com/<username>/<repositoru>.git" );
+//                    cloneCommand.setCredentialsProvider( new UsernamePasswordCredentialsProvider( "<username>", "<password>" ) );
+//                    cloneCommand.call();
+//                }
+//            } catch (Exception e) {
+//                System.out.println("EXCEPTION....");
+//                e.printStackTrace();
+//            }
+//        }
     }
 
